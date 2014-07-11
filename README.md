@@ -1,0 +1,4 @@
+awesome
+=======
+
+Awesome configuration
