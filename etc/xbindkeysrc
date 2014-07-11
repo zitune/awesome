@@ -1,0 +1,40 @@
+"~/scripts/dualscreen.sh"
+    m:0x0 + c:156
+    XF86Launch1
+
+"slock"
+    m:0x0 + c:160
+    XF86ScreenSaver
+
+"xrandr --auto && xrandr --output LVDS1 --auto --output HDMI1 --right-of LVDS1"
+    m:0x0 + c:235
+    XF86Display
+
+"import -window root ~/tmp/screen.jpg && firefox ~/tmp/screen.jpg"
+    m:0x0 + c:107
+    Print
+
+"~/.config/awesome/scripts/ssh.sh"
+    m:0x40 + c:69
+    Mod4 + F3
+
+"awesome-client <<< 'awful.tag.viewprev()'"
+    b:8
+
+"awesome-client <<< 'awful.tag.viewnext()'"
+    b:9
+
+"awesome-client <<< 'awful.mouse.client_under_pointer().fullscreen = not awful.mouse.client_under_pointer().fullscreen'"
+    b:13
+
+"sleep 0.2 ; awesome-client <<< 'expose()'"
+    b:10
+
+"amixer set Master 5%-"
+    m:0x0 + c:122
+    XF86AudioLowerVolume
+
+"amixer set Master 5%+"
+    m:0x0 + c:123
+    XF86AudioRaiseVolume
+
