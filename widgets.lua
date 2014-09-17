@@ -389,7 +389,6 @@ minutetimer:start()
 
 -- Every two seconds
 function twosecondsfunction()
-   messageupdater()
    -- copywatcher()
    if bottombox[1] and bottombox[1].visible
    then
@@ -406,7 +405,6 @@ twosecondstimer:start()
 batteryupdater()
 temperatureupdater()
 logsupdater()
-messageupdater()
 loadupdater()
 networkupdater()
 logsupdater()
