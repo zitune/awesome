@@ -16,7 +16,7 @@ border_normal		= "#333333"
 border_focus		= "#ffffff"
 border_marked		= "#990000"
 
-wallpaper		= "/home/hybris/Pictures/wallpapers/wallpaper"
+wallpaper		= "/home/hybris/Pictures/wallpaper"
 icon_path		= "/usr/share/awesome/themes/default/"
 
 

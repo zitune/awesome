@@ -106,12 +106,17 @@ end
 -- htop viewer
 cpu_last_notif = nil
 function cpu_popup()
-   local top = awful.util.pread(scriptpath .. "tablifier.py \"" ..string.gsub(awful.util.pread("ps ax --no-headers -o \"%C %p %c\" | sort -n -k1 -r | head -n 10"), " +", ";") .. "\"")
+   local f = io.popen(scriptpath .. "top.py")
+   local res = ""
+   for l in f:lines()
+   do
+      res = res .. l .. "\n"
+   end
 
    if cpu_last_notif then naughty.destroy(cpu_last_notif) end
    cpu_last_notif = naughty.notify({title = "<span color='" .. naughty_fg .. "'>CPU usage</span>",
 				      preset = naughty.config.presets.toolbar,
-				      text = top,
+				      text = res:sub(1, #res - 1),
 				      timeout = 0})
 end
 local cpu_notif_timer = timer({timeout = 5})

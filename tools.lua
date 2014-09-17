@@ -211,4 +211,3 @@ awful.util.spawn_with_shell("emacsclient -e '()' || emacs-snapshot --daemon -l ~
 awful.util.spawn_with_shell("seaf-cli start")
 awful.util.spawn_with_shell("killall xcompmgr ; xcompmgr")
 awful.util.spawn_with_shell("killall vlc ; cvlc --one-instance -I http > /tmp/vlc.log 2>&1")
-awful.util.spawn_with_shell("killall offlineimap; offlineimap > /tmp/offlineimap.log")
