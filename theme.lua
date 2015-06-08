@@ -16,8 +16,9 @@ border_normal		= "#333333"
 border_focus		= "#ffffff"
 border_marked		= "#990000"
 
-wallpaper		= "/home/hybris/Pictures/wallpaper"
+wallpaper		= "/home/hybris/Downloads/wallpaper"
 icon_path		= "/usr/share/awesome/themes/default/"
+for s = 1, screen.count() do gears.wallpaper.maximized(wallpaper, s, true) end
 
 
 -- Should not be changed from here
@@ -96,7 +97,5 @@ theme.layout_spiral	= icon_path .. "layouts/spiralw.png"
 theme.layout_dwindle	= icon_path .. "layouts/dwindlew.png"
 
 theme.awesome_icon = "/usr/share/awesome/icons/awesome16.png"
-
-theme.wallpaper_cmd = {"feh --bg-scale " .. wallpaper}
 
 return theme

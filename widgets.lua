@@ -13,37 +13,28 @@ local lastnotif	= nil
 
 -- Useful function to link a function returning a string to a widget as a notification on mouse hover
 function addNotificationToWidget(mywidget, func)
-   mywidget:add_signal('mouse::enter',
-		       function ()
-			  local data = func()
-			  if data.text then lastnotif = naughty.notify(data) end
-		       end)
-   mywidget:add_signal('mouse::leave',
-		       function () naughty.destroy(lastnotif) end)
+   mywidget:connect_signal('mouse::enter',
+			   function ()
+			      local data = func()
+			      if data and data.text then lastnotif = naughty.notify(data) end
+			   end)
+   mywidget:connect_signal('mouse::leave', function () naughty.destroy(lastnotif) end)
 end
 
 
 -------------
 -- Widgets --
 -------------
-
--- Separator
-separator = widget({type="textbox"})
-separator.text = " "
-
-
 -- Task list
 taskwidget = {}
-for s = 1, screen.count() do
-   taskwidget[s] = awful.widget.tasklist(function(c)
-					    return awful.widget.tasklist.label.currenttags(c, s)
-					 end, {})
-end
+for s = 1, screen.count() do taskwidget[s] = awful.widget.tasklist(s, awful.widget.tasklist.filter.currenttags, nil) end
 
+-- Dispkay
+lwidget = wibox.widget.textbox("[")
+rwidget = wibox.widget.textbox("]")
 
 -- Battery
-batterywidget = widget({type = 'textbox'})
-batterywidget.text = ""
+batterywidget = wibox.widget.textbox()
 local percent = nil
 local discharging = nil
 local time = nil
@@ -53,37 +44,97 @@ function batteryupdater()
    discharging = string.match(bat, "Discharging")
    time = string.match(bat, "(%d*:%d*:%d*)")
 
-   local ret ="<span weight='bold' color ='" .. theme.fg_focus .. "'>🔋</span> "
+   local ret ="[<span weight='bold' color ='" .. theme.fg_focus .. "'>🔋</span> "
    if time == nil and tonumber(percent) > 98 then ret = ret .. "Full <span color='green'>↯</span>"
-   elseif time == nil then ret = ret .. "<span color='" .. theme.fg_focus .. "'>" .. percent .. "%</span> <span color='green'>▲</span>"
+   elseif time == nil then ret = ret .. "<span color='" .. theme.fg_focus .. "'>" .. percent .. "%</span> <span color='green'>▲</span>]"
    elseif discharging == nil
    then
-      if tonumber(percent) > 98 then ret = ret .. "Full <span color='green'>↯</span>"
-      else ret = ret .. "<span color='" .. theme.fg_focus .. "'>" .. percent .. "%</span> <span color='green'>▲</span>" end
-   elseif tonumber(percent) > 66 then ret = ret .. "<span color='" .. theme.fg_focus .. "'>" .. percent .. "%</span> <span color='yellow'>▼</span>"
-   elseif tonumber(percent) > 33 then ret = ret .. "<span color='" .. theme.fg_focus .. "'>" .. percent .. "%</span> <span color='orange'>▼</span>"
-   else ret = ret .. "<span color='" .. theme.fg_focus .. "'>".. percent .. "%</span> <span color='red'>▼</span> (" .. time .. ")" end
+      if tonumber(percent) > 98 then ret = ret .. "Full <span color='green'>↯</span>]"
+      else ret = ret .. "<span color='" .. theme.fg_focus .. "'>" .. percent .. "%</span> <span color='green'>▲</span>]" end
+   elseif tonumber(percent) > 66 then ret = ret .. "<span color='" .. theme.fg_focus .. "'>" .. percent .. "%</span> <span color='yellow'>▼</span>]"
+   elseif tonumber(percent) > 33 then ret = ret .. "<span color='" .. theme.fg_focus .. "'>" .. percent .. "%</span> <span color='orange'>▼</span>]"
+   else ret = ret .. "<span color='" .. theme.fg_focus .. "'>".. percent .. "%</span> <span color='red'>▼</span> (" .. time .. ")]" end
 
-   batterywidget.text = ret
+   batterywidget:set_markup(ret)
 end
-batterywidget:add_signal('mouse::enter', function ()
-					    if time then batterywidget.text = batterywidget.text .. " (".. time .. ")" end
-					 end)
-batterywidget:add_signal('mouse::leave', batteryupdater)
+batterywidget:connect_signal('mouse::enter', function () if time then battery_popup = naughty.notify({text = time}) end end)
+batterywidget:connect_signal('mouse::leave', function() if battery_popup then naughty.destroy(battery_popup) end end)
 
 
 -- Clock
-clockwidget = awful.widget.textclock({}, "<span color='" .. theme.fg_focus .. "'>%d/%m/%Y %R</span>")
-calendar2.addCalendarToWidget(clockwidget)
+clockwidget = awful.widget.textclock("[<span color='" .. theme.fg_focus .. "'>%d/%m/%Y %R</span>]")
+function displayMonth(month, year, weekStart)
+   local current_day_format = "<u>%s</u>"
+   local t, wkSt = os.time{year = year, month = month + 1, day = 0}, weekStart or 1
+   local d = os.date("*t", t)
+   local mthDays, stDay = d.day, (d.wday - d.day-wkSt + 1) % 7
+   local lines = "    "
+   for x = 0, 6 do
+      lines = lines .. os.date("%a ", os.time{year = 2006, month = 1, day = x + wkSt})
+   end
+   lines = lines .. "\n" .. os.date(" %V", os.time{year = year, month = month, day = 1})
+   local writeLine = 1
+   while writeLine < (stDay + 1) do
+      lines = lines .. "    "
+      writeLine = writeLine + 1
+   end
+   for d = 1, mthDays do
+      local x = d
+      local t = os.time{year = year, month = month, day = d}
+      if writeLine == 8 then
+	 writeLine = 1
+	 lines = lines .. "\n" .. os.date(" %V", t)
+      end
+      if os.date("%Y-%m-%d") == os.date("%Y-%m-%d", t) then
+	 x = string.format(current_day_format, d)
+      end
+      if (#(tostring(d)) == 1) then
+	 x = " " .. x
+      end
+      lines = lines .. "  " .. x
+      writeLine = writeLine + 1
+   end
+   local header = os.date("%B %Y\n",os.time{year=year,month=month,day=1})
+   return lines
+end
+function next_month(month, year)
+   if month ~= 12 then return month + 1, year
+   else return 1, year + 1 end
+end
+function previous_month(month, year)
+   if month ~= 1 then return month - 1, year
+   else return 12, year - 1 end
+end
+clockwidget:connect_signal('mouse::enter',
+			   function ()
+			      month, year = os.date('%m'), os.date('%Y')
+			      calendar_popup = naughty.notify({title = month .. "/" .. year,
+								 text = displayMonth(month, year, 2)})
+			   end)
+clockwidget:buttons(awful.util.table.join(
+					  awful.button({ }, 1, function()
+								  if calendar_popup then naughty.destroy(calendar_popup) end
+								  month, year = previous_month(month, year)
+								  calendar_popup = naughty.notify({title = month .. "/" .. year,
+												     text = displayMonth(month, year, 2)})
+							       end),
+					  awful.button({ }, 3, function()
+								  if calendar_popup then naughty.destroy(calendar_popup) end
+								  month, year = next_month(month, year)
+								  calendar_popup = naughty.notify({title = month .. "/" .. year,
+												     text = displayMonth(month, year, 2)})
+							       end)
+
+				    ))
+clockwidget:connect_signal('mouse::leave', function() if calendar_popup then naughty.destroy(calendar_popup) end end)
 
 
 -- Load
-loadwidget = widget({ type = "textbox"})
-loadwidget.text = "NL"
+loadwidget = wibox.widget.textbox()
 function loadupdater()
    local file = io.open("/proc/loadavg")
    local csv = split(file:read(), " ")
-   local res = "<span weight='bold' color ='" .. theme.fg_focus .. "'>Load:</span> "
+   local res = "[<span weight='bold' color ='" .. theme.fg_focus .. "'>Load:</span> "
 
    local min = csv[1]
    local min5 = csv[2]
@@ -96,12 +147,11 @@ function loadupdater()
    elseif tonumber(min5) < 16 then res = res .. "<span color='orange'>" .. min5 .. "</span> "
    else res = res .. "<span color='red'>" .. min5 .. "</span> " end
 
-   if tonumber(min15) < 8 then res = res .. "<span color='" .. theme.fg_focus .. "'>" .. min15 .. "</span>"
-   elseif tonumber(min15) < 16 then res = res .. "<span color='orange'>" .. min15 .. "</span>"
-   else res15 = res .. "<span color='red'>" .. min15 .. "</span>" end
+   if tonumber(min15) < 8 then res = res .. "<span color='" .. theme.fg_focus .. "'>" .. min15 .. "</span>]"
+   elseif tonumber(min15) < 16 then res = res .. "<span color='orange'>" .. min15 .. "</span>]"
+   else res15 = res .. "<span color='red'>" .. min15 .. "</span>]" end
 
-
-   loadwidget.text = res
+   loadwidget:set_markup(res)
 end
 -- htop viewer
 cpu_last_notif = nil
@@ -114,34 +164,31 @@ function cpu_popup()
    end
 
    if cpu_last_notif then naughty.destroy(cpu_last_notif) end
-   cpu_last_notif = naughty.notify({title = "<span color='" .. naughty_fg .. "'>CPU usage</span>",
+   cpu_last_notif = naughty.notify({title = "CPU usage",
 				      preset = naughty.config.presets.toolbar,
 				      text = res:sub(1, #res - 1),
 				      timeout = 0})
 end
 local cpu_notif_timer = timer({timeout = 5})
-cpu_notif_timer:add_signal("timeout", cpu_popup)
-loadwidget:add_signal('mouse::enter', function()
-					 cpu_popup()
-					 cpu_notif_timer:start()
-				      end)
-loadwidget:add_signal('mouse::leave', function()
-					 cpu_notif_timer:stop()
-					 if cpu_last_notif then naughty.destroy(cpu_last_notif) end
-				      end)
+cpu_notif_timer:connect_signal("timeout", cpu_popup)
+loadwidget:connect_signal('mouse::enter', function()
+					     cpu_popup()
+					     cpu_notif_timer:start()
+					  end)
+loadwidget:connect_signal('mouse::leave', function()
+					     cpu_notif_timer:stop()
+					     if cpu_last_notif then naughty.destroy(cpu_last_notif) end
+					  end)
 
 
 -- Filesystems
-fswidget = widget({type = "textbox"})
-fswidget.text = "<span weight='bold' color='" .. theme.fg_focus .. "'>FS</span>"
+fswidget = wibox.widget.textbox()
+fswidget:set_markup("[<span weight='bold' color='" .. theme.fg_focus .. "'>FS</span>]")
 function show_fs()
    local f = io.popen(scriptpath .. "fs.py")
    local res = ""
-   for l in f:lines()
-   do
-      res = res .. l .. "\n"
-   end
-   return {title = "<span color='" .. naughty_fg .. "'>FS</span>",
+   for l in f:lines() do res = res .. l .. "\n" end
+   return {title = FS,
       preset = naughty.config.presets.toolbar,
       text = res:sub(1, #res - 1),
       timeout = 0}
@@ -150,15 +197,14 @@ addNotificationToWidget(fswidget, show_fs)
 
 
 -- Kernel log
-logs = widget({type = "textbox"})
-logs.text = ""
+logs = wibox.widget.textbox()
 local lastline = -1
 local lastlog = nil
 function logsupdater()
    local res = string.sub(awful.util.pread("tail -n1 /var/log/kern.log"), 0, 145)
    local date = res:sub(1, 15)
-   local message = normalize(res:sub(48, #res), true)
-   logs.text = "<span weight='bold' color='" .. theme.fg_focus .. "'>" .. date .. "</span>: <span color='" .. theme.fg_focus .. "'>" .. message .. "</span>"
+   local message = normalize(res:sub(48, #res - 1), true)
+   logs:set_markup("[<span weight='bold' color='" .. theme.fg_focus .. "'>" .. date .. "</span>: <span color='" .. theme.fg_focus .. "'>" .. message .. "</span>]")
 end
 function logsnotifier()
    local tl = tonumber(awful.util.pread("cat /var/log/kern.log | wc -l"))
@@ -177,27 +223,24 @@ function logsnotifier()
    lastline = tl
 end
 logsnotifiertimer = timer({timeout = 2})
-logsnotifiertimer:add_signal("timeout", logsnotifier)
-logs:add_signal('mouse::enter',
-		function () logsnotifiertimer:start() end)
-logs:add_signal('mouse::leave',
-		function ()
-		   logsnotifiertimer:stop()
-		   if lastlog then naughty.destroy(lastlog) end
-		end)
+logsnotifiertimer:connect_signal("timeout", logsnotifier)
+logs:connect_signal('mouse::enter',
+		    function () logsnotifiertimer:start() end)
+logs:connect_signal('mouse::leave',
+		    function ()
+		       logsnotifiertimer:stop()
+		       if lastlog then naughty.destroy(lastlog) end
+		    end)
 
 
 -- Memory
-memorywidget = widget({type = "textbox"})
-memorywidget.text = "<span weight='bold' color='" .. theme.fg_focus .. "'>MEM</span>"
+memorywidget = wibox.widget.textbox()
+memorywidget:set_markup("[<span weight='bold' color='" .. theme.fg_focus .. "'>MEM</span>]")
 function show_memory()
    local f = io.popen(scriptpath .. "memory.py")
    local res = ""
-   for l in f:lines()
-   do
-      res = res .. l .. "\n"
-   end
-   return {title = "<span color='" .. naughty_fg .. "'>Memory</span>",
+   for l in f:lines() do res = res .. l .. "\n" end
+   return {title = Memory,
       preset = naughty.config.presets.toolbar,
       text = res:sub(1, #res - 1),
       timeout = 0}
@@ -205,14 +248,8 @@ end
 addNotificationToWidget(memorywidget, show_memory)
 
 
--- Monitor indicator
-monitor	= widget({type="textbox"})
-monitor.text	= "☢"
-
-
 -- Network bandwidth widget
-networkwidget = widget({type = "textbox"})
-networkwidget.text = "NL"
+networkwidget = wibox.widget.textbox()
 local lastdown = 0
 local lastup = 0
 function networkupdater()
@@ -249,7 +286,6 @@ function networkupdater()
       res = res .. math.ceil(bytesOut) .. " " .. unit[unitOut] .. " ↑</span>"
       networkwidget.text = res
 
-
       if unitIn == 1 then res = res .. math.ceil(bytesIn) .. " " .. unit[unitIn] .. "</span> <span color='green'>↓</span> "
       elseif unitIn == 2 then res = res .. math.ceil(bytesIn) .. " " .. unit[unitIn] .. "</span> <span color='orange'>↓</span> "
       elseif unitIn == 3 then res = res .. math.ceil(bytesIn) .. " " .. unit[unitIn] .. "</span> <span color='red'>↓</span> "
@@ -260,7 +296,7 @@ function networkupdater()
       elseif unitOut == 3 then res = res .. math.ceil(bytesOut) .. " " .. unit[unitOut] .. "</span> <span color='red'>↑</span>"
       end
 
-      -- networkwidget.text = res
+      -- networkwidget:set_markup(res)
    end
 end
 local network_last_notif = nil
@@ -279,71 +315,35 @@ function show_network()
 					  timeout = 0})
 end
 local network_notif_timer = timer({timeout = 1})
-network_notif_timer:add_signal("timeout", show_network)
-networkwidget:add_signal('mouse::enter', function() network_notif_timer:start() end)
-networkwidget:add_signal('mouse::leave', function()
-					    network_notif_timer:stop()
-					    if network_last_notif then naughty.destroy(network_last_notif) end
-					 end)
-
-
--- Sound
-soundwidget = widget({type = "textbox"})
-soundwidget.text = "<span weight='bold' color='" .. theme.fg_focus .. "'>VOL</span>"
-function show_volume()
-   return {title = "<span color='" .. naughty_fg .. "'>Volume</span>",
-      preset = naughty.config.presets.toolbar,
-      text = string.match(awful.util.pread("amixer get Master | tail -n1"), "%[(.*)%%%]") .. "%",
-      timeout = 0}
-end
-addNotificationToWidget(soundwidget, show_volume)
-
-
--- Tags
-tags_names = {}
-tagwidget = {}
-function tag_filter(t)
-   if t.name == "0" then return "" end
-
-   local urgent = false
-   for i = 1, #t.clients(t) do if t.clients(t)[i].urgent then urgent = true end end
-
-   local full_name = t.name
-   if tags_names[t] and tags_names[t] ~= "" then full_name = tags_names[t] end
-   -- if urgent then full_name = full_name .. "!" end
-
-   local color = "<span color='"
-   if t.selected then color = color .. theme.fg_focus .. "' weight='bold' underline='single'>"
-   elseif urgent then color = color .. "red'>"
-   else color = color .. theme.fg_focus .. "'>" end
-
-   res = "<span font_desc='" .. theme.font .. "'>" .. color .. full_name .. "</span></span> "
-   return res
-end
-for i = 1, screen.count() do tagwidget[i] = awful.widget.taglist(i, tag_filter, nil) end
+network_notif_timer:connect_signal("timeout", show_network)
+networkwidget:connect_signal('mouse::enter', function() network_notif_timer:start() end)
+networkwidget:connect_signal('mouse::leave', function()
+						network_notif_timer:stop()
+						if network_last_notif then naughty.destroy(network_last_notif) end
+					     end)
 
 
 -- Temperature
-tempwidget = widget({type = 'textbox'})
-tempwidget.text = "Temp: NL"
+tempwidget = wibox.widget.textbox()
 function temperatureupdater()
    local temp = string.match(awful.util.pread("acpi -t"), ", (%d*).")
-   local res = "<span weight='bold' color='" .. theme.fg_focus .. "'>Temp:</span> "
-   if tonumber(temp) > 80 then res = res .. "<span color='red'>" .. tonumber(temp) .. "°C</span>"
-   elseif tonumber(temp) > 60 then res = res .. "<span color='orange'>" .. tonumber(temp) .. "°C</span>"
-   else res = res.. "<span color='" .. theme.fg_focus .. "'>" .. tonumber(temp) .. "°C</span>" end
-   tempwidget.text = res
+   local res = "[<span weight='bold' color='" .. theme.fg_focus .. "'>Temp:</span> "
+   if tonumber(temp) > 80 then res = res .. "<span color='red'>" .. tonumber(temp) .. "°C</span>]"
+   elseif tonumber(temp) > 60 then res = res .. "<span color='orange'>" .. tonumber(temp) .. "°C</span>]"
+   else res = res.. "<span color='" .. theme.fg_focus .. "'>" .. tonumber(temp) .. "°C</span>]" end
+   tempwidget:set_markup(res)
 end
 
 -- Mails
-mailswidget = widget({ type = 'textbox'})
-mailswidget.text = "<span color='" .. theme.fg_normal .. "'>✉</span>"
+mailswidget = wibox.widget.textbox()
+mailswidget:set_markup("[<span color='" .. theme.fg_normal .. "'>✉</span>]")
 function mailsupdater()
    io.popen("notmuch new")
    local f = io.popen("notmuch search tag:unread")
    local res = 0
    for l in f:lines() do res = res + 1 end
-   if res ~= 0 then mailswidget.text = "<span color='red'>✉</span>" else mailswidget.text = "<span color='" .. theme.fg_normal .. "'>✉</span>" end
+   if res ~= 0 then mailswidget:set_markup("[<span color='red'>✉</span>]")
+   else mailswidget:set_markup("[<span color='" .. theme.fg_normal .. "'>✉</span>]") end
 end
 function show_mails()
    -- naughty.notify({text = "notmuch synced", timeout = 1})
@@ -353,13 +353,13 @@ function show_mails()
    res = res:sub(1, #res - 1)
    if res == "" then return  end
 
-   return {title = "<span color='" .. naughty_fg .. "'>Unread mails</span>",
+   return {title = "Unread mails",
       preset = naughty.config.presets.topbar,
       text = res,
       timeout = 0}
 end
 addNotificationToWidget(mailswidget, show_mails)
-mailswidget:add_signal("mouse::leave", function ()  end)
+mailswidget:connect_signal("mouse::leave", function ()  end)
 
 -- Watch file copy
 function copywatcher()
@@ -381,31 +381,23 @@ end
 function minutefunction()
    batteryupdater()
    mailsupdater()
-   if bottombox[1] and bottombox[1].visible then temperatureupdater() end
+   temperatureupdater()
 end
 minutetimer = timer({timeout = 60})
-minutetimer:add_signal("timeout", minutefunction)
+minutetimer:connect_signal("timeout", minutefunction)
 minutetimer:start()
 
 -- Every two seconds
 function twosecondsfunction()
    -- copywatcher()
-   if bottombox[1] and bottombox[1].visible
-   then
-      loadupdater()
-      networkupdater()
-      logsupdater()
-   end
+   loadupdater()
+   -- networkupdater()
+   logsupdater()
 end
 twosecondstimer = timer({timeout = 2})
-twosecondstimer:add_signal("timeout", twosecondsfunction)
+twosecondstimer:connect_signal("timeout", twosecondsfunction)
 twosecondstimer:start()
 
 -- Launch once at startup
-batteryupdater()
-temperatureupdater()
-logsupdater()
-loadupdater()
-networkupdater()
-logsupdater()
-mailsupdater()
+minutefunction()
+twosecondsfunction()

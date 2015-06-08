@@ -22,7 +22,7 @@ function expose()
    local function restore()
       capi.keygrabber.stop()
       capi.mousegrabber.stop()
-      t.screen = nil
+      t.activated = false
    end
 
    capi.keygrabber.run(function(mod, key, event)
