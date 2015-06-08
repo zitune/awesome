@@ -45,7 +45,7 @@ function batteryupdater()
    time = string.match(bat, "(%d*:%d*:%d*)")
 
    local ret ="[<span weight='bold' color ='" .. theme.fg_focus .. "'>🔋</span> "
-   if time == nil and tonumber(percent) > 98 then ret = ret .. "Full <span color='green'>↯</span>"
+   if time == nil and tonumber(percent) > 98 then ret = ret .. "Full <span color='green'>↯</span>]"
    elseif time == nil then ret = ret .. "<span color='" .. theme.fg_focus .. "'>" .. percent .. "%</span> <span color='green'>▲</span>]"
    elseif discharging == nil
    then
