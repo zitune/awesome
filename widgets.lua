@@ -108,7 +108,8 @@ end
 clockwidget:connect_signal('mouse::enter',
 			   function ()
 			      month, year = os.date('%m'), os.date('%Y')
-			      calendar_popup = naughty.notify({title = month .. "/" .. year,
+			      calendar_popup = naughty.notify({screen = mouse.screen,
+								 title = month .. "/" .. year,
 								 text = displayMonth(month, year, 2)})
 			   end)
 clockwidget:buttons(awful.util.table.join(

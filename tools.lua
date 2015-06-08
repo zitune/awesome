@@ -107,6 +107,7 @@ naughty.config.presets.normal.border_color	= naughty_bd
 -- Logs
 naughty.config.presets.logs =
    {position	= "bottom_right",
+   screen	= mouse.screen,
    bg		= naughty_bg,
    fg		= naughty_fg,
    border_color	= naughty_bd,
@@ -114,6 +115,7 @@ naughty.config.presets.logs =
 -- Toolbar
 naughty.config.presets.toolbar =
    {position	= "bottom_left",
+   screen	= mouse.screen,
    bg		= naughty_bg,
    fg		= naughty_fg,
    border_color	= naughty_bd,
@@ -121,6 +123,7 @@ naughty.config.presets.toolbar =
 -- Topbar
 naughty.config.presets.topbar =
    {position	= "top_left",
+   screen	= mouse.screen,
    bg		= naughty_bg,
    fg		= naughty_fg,
    border_color	= naughty_bd,
@@ -134,7 +137,7 @@ naughty.config.presets.copy =
    opacity	= 1}
 naughty.config.presets.news =
    {position	= "top_right",
-   screen	= screen.count(),
+   screen	= mouse.screen,
    bg		= naughty_bg,
    fg		= naughty_fg,
    border_color	= naughty_bd,
