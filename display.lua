@@ -33,9 +33,11 @@ for s = 1, screen.count() do
    tright:add(mailswidget)
    tright:add(batterywidget)
    tright:add(clockwidget)
-   tright:add(lwidget)
-   tright:add(wibox.widget.systray())
-   tright:add(rwidget)
+   if s == 1 then
+      tright:add(lwidget)
+      tright:add(wibox.widget.systray())
+      tright:add(rwidget)
+   end
    -- Topbox
    topbox[s] = awful.wibox({position = "top", screen = s, height = 14})
    local tlayout = wibox.layout.align.horizontal()
