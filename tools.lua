@@ -10,7 +10,7 @@ editor		= "emacsclient -c"
 browser		= "firefox"
 locker		= "slock"
 dmenufont	= "-*-courier-*-*-*-*-10-*-*-*-*-*-*-*"
-dmenuoptions	= '-nb "#000000" -nb "#ffffff" -sb "#ffffff" -sf "#000000" -fn "' .. dmenufont .. '"'
+dmenuoptions	= '-nb "#000000" -sb "#000000" -sf "#ffffff" -nf "#ffffff" -fn "' .. dmenufont .. '"'
 
 -- Global values
 notifications	= true
@@ -96,9 +96,9 @@ end
 -------------
 -- Naughty --
 -------------
-naughty_fg	= "#000000"
-naughty_bg	= "#ffffff"
-naughty_bd	= "#000000"
+naughty_fg	= "#ffffff"
+naughty_bg	= "#000000"
+naughty_bd	= "#ffffff"
 -- default
 naughty.config.presets.normal.position		= "top_right"
 naughty.config.presets.normal.fg		= naughty_fg
@@ -149,6 +149,8 @@ naughty.config.presets.news =
 awful.util.spawn_with_shell("urxvtc -e '' || urxvtd")
 awful.util.spawn_with_shell("killall xbindkeys ; xbindkeys -f " .. confpath.."etc/xbindkeysrc")
 awful.util.spawn_with_shell("xmodmap " .. confpath .. "etc/Xmodmap")
-awful.util.spawn_with_shell("emacsclient -e '()' || emacs --daemon -l ~/.emacs.d/editor.el > /tmp/emacs.log")
-awful.util.spawn_with_shell("seaf-cli start")
-awful.util.spawn_with_shell("killall xcompmgr ; xcompmgr")
+awful.util.spawn_with_shell("emacsclient -e '()' > /dev/null || emacs --daemon -l ~/.emacs.d/editor.el > /tmp/emacs.log")
+awful.util.spawn_with_shell("ps aux | grep nm-applet | grep -v grep > /dev/null || nm-applet")
+awful.util.spawn_with_shell("ps aux | grep pasystray | grep -v grep > /dev/null || pasystray")
+awful.util.spawn_with_shell("ps aux | grep blueman-applet | grep -v grep > /dev/null || blueman-applet")
+

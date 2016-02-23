@@ -1,24 +1,24 @@
 -- Should only change this part
 font			= "SourceCodePro 9"
 
-bg_normal		= "#ffffff"
-bg_focus		= "#ffffff"
+bg_normal		= "#000000"
+bg_focus		= "#000000"
 bg_urgent		= "#ff0000"
 bg_minimize		= "#444444"
 
 fg_normal		= "#999999"
-fg_focus		= "#000000"
-fg_urgent		= "#000000"
+fg_focus		= "#ffffff"
+fg_urgent		= "#ffffff"
 fg_minimize		= "#000000"
 
 border_width		= "1"
-border_normal		= "#333333"
+border_normal		= "#444444"
 border_focus		= "#ffffff"
 border_marked		= "#990000"
 
-wallpaper		= "/home/hybris/Downloads/wallpaper"
+wallpaper		= "/home/hybris/.wallpaper"
 icon_path		= "/usr/share/awesome/themes/default/"
-for s = 1, screen.count() do gears.wallpaper.maximized(wallpaper, s, true) end
+for s = 1, screen.count() do gears.wallpaper.fit(wallpaper, s, "#000000") end
 
 
 -- Should not be changed from here
@@ -41,8 +41,6 @@ theme.border_focus  = border_focus
 theme.border_marked = border_marked
 
 -- icons
-theme.taglist_squares_sel	= icon_path .. "taglist/squarefw.png"
-theme.taglist_squares_unsel	= icon_path .. "taglist/squarew.png"
 theme.tasklist_floating_icon	= icon_path .. "tasklist/floatingw.png"
 theme.menu_submenu_icon		= ""
 

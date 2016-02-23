@@ -1,7 +1,6 @@
 ----------
 -- Tags --
 ----------
--- for s = 1, screen.count() do tags[s] = awful.tag({1, 2, 3, 4, 5, 6, 7, 8, 9}, s, layouts[1]) end
 for s = 1, screen.count() do tags[s] = awful.tag(range(20), s, layouts[1]) end
 
 -----------
@@ -17,6 +16,7 @@ awful.rules.rules = {
 	 buttons = clientbuttons}},
 }
 
+
 ----------
 -- Bars --
 ----------
@@ -25,17 +25,20 @@ for s = 1, screen.count() do
    local tleft = wibox.layout.fixed.horizontal()
    tleft:add(lwidget)
    tleft:add(awful.widget.taglist(s, awful.widget.taglist.filter.noempty))
-   tleft:add(rwidget)
-   tleft:add(lwidget)
+   tleft:add(mwidget)
    -- Top right
    local tright = wibox.layout.fixed.horizontal()
-   tright:add(rwidget)
+   tright:add(mwidget)
    tright:add(mailswidget)
+   tright:add(mwidget)
    tright:add(batterywidget)
+   tright:add(mwidget)
    tright:add(clockwidget)
    if s == 1 then
-      tright:add(lwidget)
+      tright:add(mwidget)
       tright:add(wibox.widget.systray())
+      tright:add(rwidget)
+   else
       tright:add(rwidget)
    end
    -- Topbox
@@ -48,13 +51,22 @@ for s = 1, screen.count() do
 
    -- Bottom left
    local bleft = wibox.layout.fixed.horizontal()
+   bleft:add(lwidget)
    bleft:add(tempwidget)
+   bleft:add(mwidget)
    bleft:add(fswidget)
+   bleft:add(mwidget)
    bleft:add(memorywidget)
+   bleft:add(mwidget)
    bleft:add(loadwidget)
+   bleft:add(mwidget)
+   bleft:add(networkwidget)
+   bleft:add(rwidget)
    -- Bottom right
    local bright = wibox.layout.fixed.horizontal()
+   bright:add(lwidget)
    bright:add(logs)
+   bright:add(rwidget)
    -- Bottombox
    bottombox[s] = awful.wibox({position = "bottom", screen = s, height = 14})
    local blayout = wibox.layout.align.horizontal()
@@ -76,6 +88,13 @@ client.connect_signal("manage",
 						client.focus = c
 					     end
 					  end)
+			 -- No border if only one client
+			 local clients= {}
+			 for n,t in ipairs(awful.tag.selectedlist(c.screen)) do
+			    for m,c in ipairs(t:clients()) do table.insert(clients, c) end
+			 end
+			 -- if awful.layout.get(c.screen).name == "fullscreen" or awful.layout.get(c.screen).name == "max" or #clients < 1 then c.border_width = 0 end
+
 			 -- Smart positon
 			 if not startup then
 			    if not c.size_hints.user_position and not c.size_hints.program_position then

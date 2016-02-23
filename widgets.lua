@@ -16,6 +16,8 @@ function addNotificationToWidget(mywidget, func)
    mywidget:connect_signal('mouse::enter',
 			   function ()
 			      local data = func()
+			      if data == nil then return end
+			      data["screen"] = mouse.screen
 			      if data and data.text then lastnotif = naughty.notify(data) end
 			   end)
    mywidget:connect_signal('mouse::leave', function () naughty.destroy(lastnotif) end)
@@ -29,8 +31,9 @@ end
 taskwidget = {}
 for s = 1, screen.count() do taskwidget[s] = awful.widget.tasklist(s, awful.widget.tasklist.filter.currenttags, nil) end
 
--- Dispkay
+-- Display
 lwidget = wibox.widget.textbox("[")
+mwidget = wibox.widget.textbox("][")
 rwidget = wibox.widget.textbox("]")
 
 -- Battery
@@ -44,25 +47,25 @@ function batteryupdater()
    discharging = string.match(bat, "Discharging")
    time = string.match(bat, "(%d*:%d*:%d*)")
 
-   local ret ="[<span weight='bold' color ='" .. theme.fg_focus .. "'>🔋</span> "
-   if time == nil and tonumber(percent) > 98 then ret = ret .. "Full <span color='green'>↯</span>]"
-   elseif time == nil then ret = ret .. "<span color='" .. theme.fg_focus .. "'>" .. percent .. "%</span> <span color='green'>▲</span>]"
+   local ret = "<span weight='bold' color ='" .. theme.fg_focus .. "'>🔋</span> "
+   if time == nil and tonumber(percent) > 98 then ret = ret .. "Full <span color='green'>↯</span>"
+   elseif time == nil then ret = ret .. "<span color='" .. theme.fg_focus .. "'>" .. tostring(percent) .. "%</span> <span color='green'>▲</span>"
    elseif discharging == nil
    then
-      if tonumber(percent) > 98 then ret = ret .. "Full <span color='green'>↯</span>]"
-      else ret = ret .. "<span color='" .. theme.fg_focus .. "'>" .. percent .. "%</span> <span color='green'>▲</span>]" end
-   elseif tonumber(percent) > 66 then ret = ret .. "<span color='" .. theme.fg_focus .. "'>" .. percent .. "%</span> <span color='yellow'>▼</span>]"
-   elseif tonumber(percent) > 33 then ret = ret .. "<span color='" .. theme.fg_focus .. "'>" .. percent .. "%</span> <span color='orange'>▼</span>]"
-   else ret = ret .. "<span color='" .. theme.fg_focus .. "'>".. percent .. "%</span> <span color='red'>▼</span> (" .. time .. ")]" end
+      if tonumber(percent) > 98 then ret = ret .. "Full <span color='green'>↯</span>"
+      else ret = ret .. "<span color='" .. theme.fg_focus .. "'>" .. tostring(percent) .. "%</span> <span color='green'>▲</span>" end
+   elseif tonumber(percent) > 66 then ret = ret .. "<span color='" .. theme.fg_focus .. "'>" .. tostring(percent) .. "%</span> <span color='yellow'>▼</span>"
+   elseif tonumber(percent) > 33 then ret = ret .. "<span color='" .. theme.fg_focus .. "'>" .. tostring(percent) .. "%</span> <span color='orange'>▼</span>"
+   else ret = ret .. "<span color='" .. theme.fg_focus .. "'>".. tostring(percent) .. "%</span> <span color='red'>▼</span> (" .. tostring(time) .. ")" end
 
    batterywidget:set_markup(ret)
 end
-batterywidget:connect_signal('mouse::enter', function () if time then battery_popup = naughty.notify({text = time}) end end)
+batterywidget:connect_signal('mouse::enter', function () if time then battery_popup = naughty.notify({text = time, timeout = 0}) end end)
 batterywidget:connect_signal('mouse::leave', function() if battery_popup then naughty.destroy(battery_popup) end end)
 
 
 -- Clock
-clockwidget = awful.widget.textclock("[<span color='" .. theme.fg_focus .. "'>%d/%m/%Y %R</span>]")
+clockwidget = awful.widget.textclock("<span color='" .. theme.fg_focus .. "'>%d/%m/%Y %R</span>")
 function displayMonth(month, year, weekStart)
    local current_day_format = "<u>%s</u>"
    local t, wkSt = os.time{year = year, month = month + 1, day = 0}, weekStart or 1
@@ -108,22 +111,27 @@ end
 clockwidget:connect_signal('mouse::enter',
 			   function ()
 			      month, year = os.date('%m'), os.date('%Y')
-			      calendar_popup = naughty.notify({screen = mouse.screen,
-								 title = month .. "/" .. year,
-								 text = displayMonth(month, year, 2)})
+			      calendar_popup = naughty.notify({title = month .. "/" .. year,
+								 screen = mouse.screen,
+								 text = displayMonth(month, year, 2),
+								 timeout = 0})
 			   end)
 clockwidget:buttons(awful.util.table.join(
 					  awful.button({ }, 1, function()
 								  if calendar_popup then naughty.destroy(calendar_popup) end
 								  month, year = previous_month(month, year)
 								  calendar_popup = naughty.notify({title = month .. "/" .. year,
-												     text = displayMonth(month, year, 2)})
+												     screen = mouse.screen,
+												     text = displayMonth(month, year, 2),
+												     timeout = 0})
 							       end),
 					  awful.button({ }, 3, function()
 								  if calendar_popup then naughty.destroy(calendar_popup) end
 								  month, year = next_month(month, year)
 								  calendar_popup = naughty.notify({title = month .. "/" .. year,
-												     text = displayMonth(month, year, 2)})
+												     screen = mouse.screen,
+												     text = displayMonth(month, year, 2),
+												     timeout = 0})
 							       end)
 
 				    ))
@@ -135,7 +143,7 @@ loadwidget = wibox.widget.textbox()
 function loadupdater()
    local file = io.open("/proc/loadavg")
    local csv = split(file:read(), " ")
-   local res = "[<span weight='bold' color ='" .. theme.fg_focus .. "'>Load:</span> "
+   local res = "<span weight='bold' color ='" .. theme.fg_focus .. "'>Load:</span> "
 
    local min = csv[1]
    local min5 = csv[2]
@@ -148,9 +156,9 @@ function loadupdater()
    elseif tonumber(min5) < 16 then res = res .. "<span color='orange'>" .. min5 .. "</span> "
    else res = res .. "<span color='red'>" .. min5 .. "</span> " end
 
-   if tonumber(min15) < 8 then res = res .. "<span color='" .. theme.fg_focus .. "'>" .. min15 .. "</span>]"
-   elseif tonumber(min15) < 16 then res = res .. "<span color='orange'>" .. min15 .. "</span>]"
-   else res15 = res .. "<span color='red'>" .. min15 .. "</span>]" end
+   if tonumber(min15) < 8 then res = res .. "<span color='" .. theme.fg_focus .. "'>" .. min15 .. "</span>"
+   elseif tonumber(min15) < 16 then res = res .. "<span color='orange'>" .. min15 .. "</span>"
+   else res15 = res .. "<span color='red'>" .. min15 .. "</span>" end
 
    loadwidget:set_markup(res)
 end
@@ -166,6 +174,7 @@ function cpu_popup()
 
    if cpu_last_notif then naughty.destroy(cpu_last_notif) end
    cpu_last_notif = naughty.notify({title = "CPU usage",
+				      screen = mouse.screen,
 				      preset = naughty.config.presets.toolbar,
 				      text = res:sub(1, #res - 1),
 				      timeout = 0})
@@ -184,7 +193,7 @@ loadwidget:connect_signal('mouse::leave', function()
 
 -- Filesystems
 fswidget = wibox.widget.textbox()
-fswidget:set_markup("[<span weight='bold' color='" .. theme.fg_focus .. "'>FS</span>]")
+fswidget:set_markup("<span weight='bold' color='" .. theme.fg_focus .. "'>FS</span>")
 function show_fs()
    local f = io.popen(scriptpath .. "fs.py")
    local res = ""
@@ -199,44 +208,30 @@ addNotificationToWidget(fswidget, show_fs)
 
 -- Kernel log
 logs = wibox.widget.textbox()
-local lastline = -1
 local lastlog = nil
 function logsupdater()
    local res = string.sub(awful.util.pread("tail -n1 /var/log/kern.log"), 0, 145)
    local date = res:sub(1, 15)
    local message = normalize(res:sub(48, #res - 1), true)
-   logs:set_markup("[<span weight='bold' color='" .. theme.fg_focus .. "'>" .. date .. "</span>: <span color='" .. theme.fg_focus .. "'>" .. message .. "</span>]")
+   logs:set_markup("<span weight='bold' color='" .. theme.fg_focus .. "'>" .. date .. "</span>: <span color='" .. theme.fg_focus .. "'>" .. message .. "</span>")
 end
 function logsnotifier()
-   local tl = tonumber(awful.util.pread("cat /var/log/kern.log | wc -l"))
-   if lastline == -1
+   res = awful.util.pread("tail -n 20 /var/log/kern.log | source-highlight --failsafe --src-lang=log --style-file=default.style --outlang-def=" .. confpath .. "etc/awesome.outlang")
+   if res ~= ""
    then
-      lastline = tl
-      return
-   end
-   res = awful.util.pread("cat /var/log/kern.log | tail -n " .. tl - lastline .. " | source-highlight --failsafe --src-lang=log --style-file=default.style --outlang-def=" .. confpath .. "etc/awesome.outlang")
-   if res ~= "" and notifications
-   then
-      if lastlog then naughty.destroy(lastlog) end
       res = res:sub(1, #res - 1)
-      lastlog = naughty.notify{preset = naughty.config.presets.logs, text = res, timeout = 0}
+      return {title = "Logs",
+	 preset = naughty.config.presets.logs,
+	 text = res,
+	 timeout = 0}
    end
-   lastline = tl
 end
-logsnotifiertimer = timer({timeout = 2})
-logsnotifiertimer:connect_signal("timeout", logsnotifier)
-logs:connect_signal('mouse::enter',
-		    function () logsnotifiertimer:start() end)
-logs:connect_signal('mouse::leave',
-		    function ()
-		       logsnotifiertimer:stop()
-		       if lastlog then naughty.destroy(lastlog) end
-		    end)
+addNotificationToWidget(logs, logsnotifier)
 
 
 -- Memory
 memorywidget = wibox.widget.textbox()
-memorywidget:set_markup("[<span weight='bold' color='" .. theme.fg_focus .. "'>MEM</span>]")
+memorywidget:set_markup("<span weight='bold' color='" .. theme.fg_focus .. "'>MEM</span>")
 function show_memory()
    local f = io.popen(scriptpath .. "memory.py")
    local res = ""
@@ -286,31 +281,26 @@ function networkupdater()
       res = res .. math.ceil(bytesIn) .. " " .. unit[unitIn] .. " ↓ "
       res = res .. math.ceil(bytesOut) .. " " .. unit[unitOut] .. " ↑</span>"
       networkwidget.text = res
-
-      if unitIn == 1 then res = res .. math.ceil(bytesIn) .. " " .. unit[unitIn] .. "</span> <span color='green'>↓</span> "
-      elseif unitIn == 2 then res = res .. math.ceil(bytesIn) .. " " .. unit[unitIn] .. "</span> <span color='orange'>↓</span> "
-      elseif unitIn == 3 then res = res .. math.ceil(bytesIn) .. " " .. unit[unitIn] .. "</span> <span color='red'>↓</span> "
-      end
-      res = res .. "<span color='" .. theme.fg_focus .. "'>"
-      if unitOut == 1 then res = res .. math.ceil(bytesOut) .. " " .. unit[unitOut] .. "</span> <span color='green'>↑</span>"
-      elseif unitOut == 2 then res = res .. math.ceil(bytesOut) .. " " .. unit[unitOut] .. "</span> <span color='orange'>↑</span>"
-      elseif unitOut == 3 then res = res .. math.ceil(bytesOut) .. " " .. unit[unitOut] .. "</span> <span color='red'>↑</span>"
-      end
-
-      -- networkwidget:set_markup(res)
+      networkwidget:set_markup(res)
    end
 end
 local network_last_notif = nil
 function show_network()
-   local f = io.popen(scriptpath .. "network.py")
-   local res = ""
+   local f = io.popen("wget -qO- http://ipecho.net/plain")
+   local res = "Public IP: "
+   for l in f:lines()
+   do
+      res = res .. l .. "\n"
+   end
+   f = io.popen(scriptpath .. "network.py")
    for l in f:lines()
    do
       res = res .. l .. "\n"
    end
 
    if network_last_notif then naughty.destroy(network_last_notif) end
-   network_last_notif = naughty.notify({title = "<span color='" .. naughty_fg .. "'>Network</span>",
+   network_last_notif = naughty.notify({title = Network,
+					  screen = mouse.screen,
 					  preset = naughty.config.presets.toolbar,
 					  text = res:sub(1, #res - 1),
 					  timeout = 0})
@@ -328,23 +318,23 @@ networkwidget:connect_signal('mouse::leave', function()
 tempwidget = wibox.widget.textbox()
 function temperatureupdater()
    local temp = string.match(awful.util.pread("acpi -t"), ", (%d*).")
-   local res = "[<span weight='bold' color='" .. theme.fg_focus .. "'>Temp:</span> "
-   if tonumber(temp) > 80 then res = res .. "<span color='red'>" .. tonumber(temp) .. "°C</span>]"
-   elseif tonumber(temp) > 60 then res = res .. "<span color='orange'>" .. tonumber(temp) .. "°C</span>]"
-   else res = res.. "<span color='" .. theme.fg_focus .. "'>" .. tonumber(temp) .. "°C</span>]" end
+   local res = "<span weight='bold' color='" .. theme.fg_focus .. "'>Temp:</span> "
+   if tonumber(temp) > 80 then res = res .. "<span color='red'>" .. tonumber(temp) .. "°C</span>"
+   elseif tonumber(temp) > 60 then res = res .. "<span color='orange'>" .. tonumber(temp) .. "°C</span>"
+   else res = res.. "<span color='" .. theme.fg_focus .. "'>" .. tonumber(temp) .. "°C</span>" end
    tempwidget:set_markup(res)
 end
 
 -- Mails
 mailswidget = wibox.widget.textbox()
-mailswidget:set_markup("[<span color='" .. theme.fg_normal .. "'>✉</span>]")
+mailswidget:set_markup("<span weight='bold' color='" .. theme.fg_focus .. "'>✉</span>")
 function mailsupdater()
    io.popen("notmuch new")
    local f = io.popen("notmuch search tag:unread")
    local res = 0
    for l in f:lines() do res = res + 1 end
-   if res ~= 0 then mailswidget:set_markup("[<span color='red'>✉</span>]")
-   else mailswidget:set_markup("[<span color='" .. theme.fg_normal .. "'>✉</span>]") end
+   if res ~= 0 then mailswidget:set_markup("<span color='red'>✉</span>")
+   else mailswidget:set_markup("<span weight='bold' color='" .. theme.fg_focus .. "'>✉</span>") end
 end
 function show_mails()
    -- naughty.notify({text = "notmuch synced", timeout = 1})
@@ -392,7 +382,7 @@ minutetimer:start()
 function twosecondsfunction()
    -- copywatcher()
    loadupdater()
-   -- networkupdater()
+   networkupdater()
    logsupdater()
 end
 twosecondstimer = timer({timeout = 2})
