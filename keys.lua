@@ -20,7 +20,6 @@
 -- | Mod4 + Shift + Enter | Open teardropped terminal     |
 -- | Mod4 + e             | Open emacs                    |
 -- | Mod4 + Shift + e     | Open teardropped emacs        |
--- | Mod4 + z             | Launch zlock                  |
 -- | Mod4 + Control + e   | Revelation (MacOS X's Expose) |
 -- | Mod4 + a             | Open awesome configuration    |
 --
@@ -90,7 +89,6 @@ globalkeys =
 			 awful.key({ modkey, "Shift" }, "Return", function () teardrop(term, "bottom", "left", .90, 1, true) end),
 			 awful.key({modkey}, "e",                 function () awful.util.spawn_with_shell(editor) end),
 			 awful.key({ modkey, "Shift" }, "e",      function () teardrop(editor, "bottom", "right", .90, 1, true) end),
-			 awful.key({modkey}, "z",                 function () awful.util.spawn_with_shell(locker) end),
 			 awful.key({modkey, "Control"}, "e",      expose),
 			 awful.key({modkey}, "a",                 function () awful.util.spawn_with_shell(editor .. " " .. confpath .. "rc.lua") end),
 

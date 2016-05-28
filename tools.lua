@@ -8,7 +8,6 @@ scriptpath	= confpath .. "scripts/"
 term		= "urxvtc"
 editor		= "emacsclient -c"
 browser		= "firefox"
-locker		= "slock"
 dmenufont	= "-*-courier-*-*-*-*-10-*-*-*-*-*-*-*"
 dmenuoptions	= '-nb "#000000" -sb "#000000" -sf "#ffffff" -nf "#ffffff" -fn "' .. dmenufont .. '"'
 

@@ -340,7 +340,7 @@ function show_mails()
    -- naughty.notify({text = "notmuch synced", timeout = 1})
    mailsupdater()
    local res = ""
-   for l in io.popen("/home/hybris/scripts/new_mails.py awesome"):lines() do res = res .. l .. "\n" end
+   for l in io.popen("/home/hybris/.scripts/new_mails.py awesome"):lines() do res = res .. l .. "\n" end
    res = res:sub(1, #res - 1)
    if res == "" then return  end
 

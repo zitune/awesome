@@ -4,10 +4,13 @@ import prettytable
 from subprocess import Popen, PIPE
 
 MOUNTPOINTS = {'/': None,
-               '/home': None,
-               '/home/hybris/Downloads': None,
+               '/boot': None,
+               '/home/hybris': None,
                '/home/hybris/dev': None,
-               '/home/hybris/Mail': None}
+               '/home/hybris/Documents': None,
+               '/home/hybris/Downloads': None,
+               '/home/hybris/Mail': None,
+               '/home/hybris/Pictures': None}
 
 p = Popen("df", stdout=PIPE, shell=True)
 (output, err) = p.communicate()

@@ -18,7 +18,7 @@ border_marked		= "#990000"
 
 wallpaper		= "/home/hybris/.wallpaper"
 icon_path		= "/usr/share/awesome/themes/default/"
-for s = 1, screen.count() do gears.wallpaper.fit(wallpaper, s, "#000000") end
+for s = 1, screen.count() do gears.wallpaper.maximized(wallpaper, s, "#000000") end
 
 
 -- Should not be changed from here

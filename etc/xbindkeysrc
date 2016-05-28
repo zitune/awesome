@@ -1,16 +1,8 @@
-"~/scripts/dualscreen.sh"
-    m:0x0 + c:156
-    XF86Launch1
-
 "slock"
-    m:0x0 + c:160
-    XF86ScreenSaver
+    m:0x0 + c:78
+    Scroll_Lock
 
-"xrandr --auto && xrandr --output LVDS1 --auto --output HDMI1 --right-of LVDS1"
-    m:0x0 + c:235
-    XF86Display
-
-"import -window root ~/Downloads/screen.jpg && firefox ~/Downloads/screen.jpg"
+"import -window root ~/Downloads/screen.jpg"
     m:0x0 + c:107
     Print
 
@@ -37,4 +29,28 @@
 "amixer set Master 5%+"
     m:0x0 + c:123
     XF86AudioRaiseVolume
+
+"xvkbd -xsendevent -text "\[Next]""
+    m:0x0 + c:89
+    KP_Next
+
+"xvkbd -xsendevent -text "\[Prior]""
+    m:0x0 + c:81
+    KP_Prior
+
+"xbacklight -20"
+    m:0x0 + c:232
+    XF86MonBrightnessDown
+
+"xbacklight +20"
+    m:0x0 + c:233
+    XF86MonBrightnessUp
+
+"xrandr --auto && xrandr --output eDP1 --auto --output HDMI1 --left-of eDP1; sleep 2; /home/hybris/.scripts/wallpaper.sh"
+    m:0x0 + c:235
+    XF86Display
+
+"sudo /usr/sbin/pm-suspend"
+    m:0x0 + c:150
+    XF86Sleep
 
