@@ -11,7 +11,7 @@ if os.path.isfile("/tmp/network_notif.tmp"):
     exit(0)
 os.system("bwm-ng -o csv -c 1 -F /tmp/network_notif.tmp")
 with open("/tmp/network_notif.tmp") as f:
-    network = f.read().split('\n')
+    network = f.read().split('\n')[:-1]
 
 network = [x.split(';') for x in network]
 

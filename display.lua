@@ -1,7 +1,11 @@
 ----------
 -- Tags --
 ----------
-for s = 1, screen.count() do tags[s] = awful.tag(range(20), s, layouts[1]) end
+for s = 1, screen.count() do tags[s] = awful.tag({1,2,3,4,5,6,7,8,9,10,11,12,13,
+						    14,15,16,17,18,19,20,21,22,
+						    23,24,25,26,27,28,29,30,31,
+						    32,33,34,35,36,37,38,39,40,
+						    41,42}, s, layouts[1]) end
 
 -----------
 -- Rules --
@@ -23,50 +27,46 @@ awful.rules.rules = {
 for s = 1, screen.count() do
    -- Top left
    local tleft = wibox.layout.fixed.horizontal()
-   tleft:add(lwidget)
+   tleft:add(lsep)
    tleft:add(awful.widget.taglist(s, awful.widget.taglist.filter.noempty))
-   tleft:add(mwidget)
+   tleft:add(msep)
    -- Top right
    local tright = wibox.layout.fixed.horizontal()
-   tright:add(mwidget)
+   tright:add(msep)
    tright:add(mailswidget)
-   tright:add(mwidget)
+   tright:add(msep)
    tright:add(batterywidget)
-   tright:add(mwidget)
+   tright:add(msep)
    tright:add(clockwidget)
    if s == 1 then
-      tright:add(mwidget)
+      tright:add(msep)
       tright:add(wibox.widget.systray())
-      tright:add(rwidget)
-   else
-      tright:add(rwidget)
    end
+   tright:add(rsep)
    -- Topbox
    topbox[s] = awful.wibox({position = "top", screen = s, height = 14})
    local tlayout = wibox.layout.align.horizontal()
    tlayout:set_left(tleft)
-   tlayout:set_middle(taskwidget[s])
+   tlayout:set_middle(awful.widget.tasklist(s, awful.widget.tasklist.filter.currenttags, nil))
    tlayout:set_right(tright)
    topbox[s]:set_widget(tlayout)
 
    -- Bottom left
    local bleft = wibox.layout.fixed.horizontal()
-   bleft:add(lwidget)
+   bleft:add(lsep)
    bleft:add(tempwidget)
-   bleft:add(mwidget)
+   bleft:add(msep)
    bleft:add(fswidget)
-   bleft:add(mwidget)
-   bleft:add(memorywidget)
-   bleft:add(mwidget)
+   bleft:add(msep)
    bleft:add(loadwidget)
-   bleft:add(mwidget)
+   bleft:add(msep)
    bleft:add(networkwidget)
-   bleft:add(rwidget)
+   bleft:add(rsep)
    -- Bottom right
    local bright = wibox.layout.fixed.horizontal()
-   bright:add(lwidget)
+   bright:add(lsep)
    bright:add(logs)
-   bright:add(rwidget)
+   bright:add(rsep)
    -- Bottombox
    bottombox[s] = awful.wibox({position = "bottom", screen = s, height = 14})
    local blayout = wibox.layout.align.horizontal()

@@ -6,10 +6,6 @@
     m:0x0 + c:107
     Print
 
-"~/.config/awesome/scripts/ssh.sh"
-    m:0x40 + c:69
-    Mod4 + F3
-
 "awesome-client <<< 'awful.tag.viewprev()'"
     b:8
 
@@ -29,6 +25,10 @@
 "amixer set Master 5%+"
     m:0x0 + c:123
     XF86AudioRaiseVolume
+
+"amixer set Master toggle"
+    m:0x0 + c:121
+    XF86AudioMute
 
 "xvkbd -xsendevent -text "\[Next]""
     m:0x0 + c:89

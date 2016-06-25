@@ -1,6 +1,6 @@
 #! /bin/bash
 
-DEST=`echo "" | dmenu -p "RSSH" -nb "#000000" -nb "#ffffff" -sb "#ffffff" -sf "#000000"`
+DEST=`echo "" | dmenu -p "RSSH" -nb "#000000" -sb "#000000" -sf "#ffffff" -nf "#ffffff" -fn "-8-courier-*-*-*-*-10-*-*-*-*-*-*-*"`
 if [ x$DEST != x ]
 then
     eval `cat ~/.ssh/environment-alpha`
