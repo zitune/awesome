@@ -1,78 +1,49 @@
 ----------
 -- Tags --
 ----------
-for s = 1, screen.count() do tags[s] = awful.tag({1,2,3,4,5,6,7,8,9,10,11,12,13,
-						    14,15,16,17,18,19,20,21,22,
-						    23,24,25,26,27,28,29,30,31,
-						    32,33,34,35,36,37,38,39,40,
-						    41,42}, s, layouts[1]) end
+tags, layouts = {}, {awful.layout.suit.fair, awful.layout.suit.max}
+for s = 1, screen.count() do tags[s] = awful.tag({1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42}, s, layouts[1]) end
 
 -----------
 -- Rules --
 -----------
-awful.rules.rules = {
-   {rule = {},
+awful.rules.rules = {{rule = {},
       properties =
 	 {border_width = beautiful.border_width,
 	 focus = awful.client.focus.filter,
 	 size_hints_honor = false,
 	 keys = clientkeys,
-	 buttons = clientbuttons}},
-}
-
+	 buttons = clientbuttons}}}
 
 ----------
 -- Bars --
 ----------
+topbox = {}
 for s = 1, screen.count() do
    -- Top left
-   local tleft = wibox.layout.fixed.horizontal()
-   tleft:add(lsep)
-   tleft:add(awful.widget.taglist(s, awful.widget.taglist.filter.noempty))
-   tleft:add(msep)
+   local left = wibox.layout.fixed.horizontal()
+   left:add(awful.widget.taglist(s, awful.widget.taglist.filter.noempty))
+   left:add(sep)
    -- Top right
-   local tright = wibox.layout.fixed.horizontal()
-   tright:add(msep)
-   tright:add(mailswidget)
-   tright:add(msep)
-   tright:add(batterywidget)
-   tright:add(msep)
-   tright:add(clockwidget)
+   local right = wibox.layout.fixed.horizontal()
    if s == 1 then
-      tright:add(msep)
-      tright:add(wibox.widget.systray())
+      right:add(sep)
+      right:add(mailwidget)
+      right:add(wibox.widget.systray())
+      right:add(sep)
+      right:add(tempwidget)
+      right:add(batterywidget)
    end
-   tright:add(rsep)
+   right:add(sep)
+   right:add(clockwidget)
+
    -- Topbox
    topbox[s] = awful.wibox({position = "top", screen = s, height = 14})
-   local tlayout = wibox.layout.align.horizontal()
-   tlayout:set_left(tleft)
-   tlayout:set_middle(awful.widget.tasklist(s, awful.widget.tasklist.filter.currenttags, nil))
-   tlayout:set_right(tright)
-   topbox[s]:set_widget(tlayout)
-
-   -- Bottom left
-   local bleft = wibox.layout.fixed.horizontal()
-   bleft:add(lsep)
-   bleft:add(tempwidget)
-   bleft:add(msep)
-   bleft:add(fswidget)
-   bleft:add(msep)
-   bleft:add(loadwidget)
-   bleft:add(msep)
-   bleft:add(networkwidget)
-   bleft:add(rsep)
-   -- Bottom right
-   local bright = wibox.layout.fixed.horizontal()
-   bright:add(lsep)
-   bright:add(logs)
-   bright:add(rsep)
-   -- Bottombox
-   bottombox[s] = awful.wibox({position = "bottom", screen = s, height = 14})
-   local blayout = wibox.layout.align.horizontal()
-   blayout:set_left(bleft)
-   blayout:set_right(bright)
-   bottombox[s]:set_widget(blayout)
+   local layout = wibox.layout.align.horizontal()
+   layout:set_left(left)
+   layout:set_middle(awful.widget.tasklist(s, awful.widget.tasklist.filter.currenttags, nil))
+   layout:set_right(right)
+   topbox[s]:set_widget(layout)
 end
 
 -------------
@@ -81,13 +52,7 @@ end
 client.connect_signal("manage",
 		      function (c, startup)
 			 -- Focus
-			 c:connect_signal("mouse::enter",
-					  function(c)
-					     if awful.layout.get(c.screen) ~= awful.layout.suit.magnifier
-						and awful.client.focus.filter(c) then
-						client.focus = c
-					     end
-					  end)
+			 c:connect_signal("mouse::enter", function(c) if awful.layout.get(c.screen) ~= awful.layout.suit.magnifier and awful.client.focus.filter(c) then client.focus = c end end)
 			 -- No border if only one client
 			 local clients= {}
 			 for n,t in ipairs(awful.tag.selectedlist(c.screen)) do
@@ -102,9 +67,7 @@ client.connect_signal("manage",
 			       awful.placement.no_offscreen(c)
 			    end
 			 -- Prevent clients from being unreachable after screen count change
-			 elseif not c.size_hints.user_position and not c.size_hints.program_position then
-			    awful.placement.no_offscreen(c)
-			 end
+			 elseif not c.size_hints.user_position and not c.size_hints.program_position then awful.placement.no_offscreen(c) end
 		      end)
 client.connect_signal("focus", function(c) c.border_color = beautiful.border_focus end)
 client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
