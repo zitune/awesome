@@ -1,23 +1,11 @@
-----------
--- Tags --
-----------
+-- Tags
 tags, layouts = {}, {awful.layout.suit.fair, awful.layout.suit.max}
 for s = 1, screen.count() do tags[s] = awful.tag({1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42}, s, layouts[1]) end
 
------------
--- Rules --
------------
-awful.rules.rules = {{rule = {},
-      properties =
-	 {border_width = beautiful.border_width,
-	 focus = awful.client.focus.filter,
-	 size_hints_honor = false,
-	 keys = clientkeys,
-	 buttons = clientbuttons}}}
+-- Rules
+awful.rules.rules = {{rule = {}, properties = {border_width = beautiful.border_width, focus = awful.client.focus.filter, size_hints_honor = false, keys = clientkeys, buttons = clientbuttons}}}
 
-----------
--- Bars --
-----------
+-- Bars
 topbox = {}
 for s = 1, screen.count() do
    -- Top left
@@ -46,9 +34,7 @@ for s = 1, screen.count() do
    topbox[s]:set_widget(layout)
 end
 
--------------
--- Signals --
--------------
+-- Signals
 client.connect_signal("manage",
 		      function (c, startup)
 			 -- Focus

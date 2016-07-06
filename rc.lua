@@ -11,13 +11,12 @@ require("awful.autofocus")
 if awesome.startup_errors then naughty.notify({preset = naughty.config.presets.critical, title = "errors during startup", text = awesome.startup_errors}) end
 do
    local in_error = false
-   awesome.connect_signal("debug::error",
-			  function (err)
-			     if in_error then return end
-			     in_error = true
-			     naughty.notify({preset = naughty.config.presets.critical, title = "error", text = err})
-			     in_error = false
-			  end)
+   awesome.connect_signal("debug::error", function (err)
+					     if in_error then return end
+					     in_error = true
+					     naughty.notify({preset = naughty.config.presets.critical, title = "error", text = err})
+					     in_error = false
+					  end)
 end
 
 -- My conf
@@ -29,9 +28,7 @@ require("keys")
 require("display")
 for s = 1, screen.count() do gears.wallpaper.maximized("/home/hybris/.wallpaper", s, "#000000") end
 
--------------
--- Autorun --
--------------
+-- Autorun
 awful.util.spawn_with_shell("urxvtc -e '' 2> /dev/null || urxvtd > /tmp/urxvtd.log 2>&1")
 awful.util.spawn_with_shell("killall xbindkeys 2> /dev/null ; xbindkeys")
 awful.util.spawn_with_shell("xmodmap ~/.xmodmaprc")
