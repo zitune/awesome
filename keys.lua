@@ -1,6 +1,6 @@
 -- Controls
 modkey = "Mod4"
-dmenuoptions = '-nb "#000000" -sb "#000000" -sf "#ffffff" -nf "#ffffff" -fn "-8-courier-*-*-*-*-10-*-*-*-*-*-*-*"'
+dmenuoptions = '-nb "#000000" -sb "#000000" -sf "#ffffff" -nf "#444444" -fn "-8-courier-*-*-*-*-10-*-*-*-*-*-*-*"'
 globalkeys = awful.util.table.join({},
 				   awful.key({modkey, "Control"}, "r",		awesome.restart),
 				   awful.key({modkey, "Control"}, "q",		awesome.quit),

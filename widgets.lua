@@ -23,9 +23,9 @@ function batteryupdater()
    bat = awful.util.pread('acpi')
    percent, discharging, time = string.match(bat, "(%d*)%%"), string.match(bat, "Discharging"), string.match(bat, "(%d*:%d*:%d*)")
 
-   if discharging == nil then batterywidget:set_markup("<span weight='bold' color='green'>🔋</span>")
-   elseif tonumber(percent) < 34 then batterywidget:set_markup("<span weight='bold' color='red'>🔋</span>" .. percent .. "%")
-   else batterywidget:set_markup("<span weight='bold' color ='" .. theme.fg_focus .. "'>🔋</span>") end
+   if discharging == nil then batterywidget:set_markup("<span weight='bold' color='green'>🔋</span> " .. percent .. "%")
+   elseif tonumber(percent) < 34 then batterywidget:set_markup("<span weight='bold' color='red'>🔋</span> " .. percent .. "%")
+   else batterywidget:set_markup("<span weight='bold' color ='" .. theme.fg_focus .. "'>🔋</span> " .. percent .. "%") end
 end
 function batterypopup() return {title = "Battery", text = bat, timeout = 0} end
 addNotificationToWidget(batterywidget, batterypopup, batteryupdater)
@@ -36,12 +36,12 @@ function clockpopup() return {title = "Calendar", text = awful.util.pread('ncal 
 addNotificationToWidget(clockwidget, clockpopup)
 
 -- Temperature
-tempwidget = wibox.widget.textbox("<span weight='bold' color='" .. theme.fg_focus .. "'>⚠</span> ")
-local temp = string.match(awful.util.pread("acpi -t"), ", (%d*).")
+tempwidget = wibox.widget.textbox()
 function tempupdater()
+   local temp = string.match(awful.util.pread("acpi -t"), ", (%d*).")
    if tonumber(temp) > 80 then tempwidget:set_markup("<span weight='bold' color='red'>⚠</span> ")
    elseif tonumber(temp) > 60 then tempwidget:set_markup("<span weight='bold' color='orange'>⚠</span> ")
-   else tempwidget:set_markup("<span weight='bold' color='" .. theme.fg_focus .. "'>⚠</span> ") end
+   else tempwidget:set_markup("") end
 end
 function temppopup() return {title = "Temperature", text = string.match(awful.util.pread("acpi -t"), ", (%d*).") .. "°C", timeout = 0} end
 addNotificationToWidget(tempwidget, temppopup)
