@@ -18,7 +18,6 @@ for s = 1, screen.count() do
       right:add(sep)
       right:add(mailwidget)
       right:add(wibox.widget.systray())
-      right:add(sep)
       right:add(tempwidget)
       right:add(batterywidget)
    end
