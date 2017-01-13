@@ -16,7 +16,7 @@ for s = 1, screen.count() do
    local right = wibox.layout.fixed.horizontal()
    if s == 1 then
       right:add(sep)
-      right:add(mailwidget)
+--      right:add(mailwidget)
       right:add(wibox.widget.systray())
       right:add(tempwidget)
       right:add(batterywidget)

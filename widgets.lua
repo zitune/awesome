@@ -34,7 +34,7 @@ addNotificationToWidget(batterywidget, batterypopup, batteryupdater)
 
 -- Clock
 clockwidget = awful.widget.textclock("<span color='" .. theme.fg_focus .. "'>%d/%m/%Y %R</span>")
-function clockpopup() return {title = "Calendar", text = awful.util.pread('ncal -hMwA 2'), timeout = 0} end
+function clockpopup() return {title = "Calendar", text = awful.util.pread('gcal -H "|:|:^[[0m:^[[0m" -b 3 -s 1'), timeout = 0} end
 addNotificationToWidget(clockwidget, clockpopup)
 
 -- Temperature
