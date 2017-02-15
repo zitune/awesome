@@ -101,8 +101,7 @@ awful.screen.connect_for_each_screen(function(s)
                     s.prompt,
                     awful.widget.taglist(s, awful.widget.taglist.filter.noempty),
                     wibox.widget.textbox(" | ")},
-                   {layout = wibox.layout.fixed.horizontal,
-                    awful.widget.tasklist(s, awful.widget.tasklist.filter.currenttags, nil)},
+                   awful.widget.tasklist(s, awful.widget.tasklist.filter.currenttags, nil),
                    {layout = wibox.layout.fixed.horizontal,
                     wibox.widget.textbox(" | "),
                     wibox.widget.systray(),
@@ -147,4 +146,4 @@ awful.util.spawn_with_shell("killall nm-applet 2> /dev/null      ; nm-applet")
 awful.util.spawn_with_shell("killall pasystray 2> /dev/null      ; pasystray")
 awful.util.spawn_with_shell("killall blueman-applet 2> /dev/null ; blueman-applet > /dev/null 2>&1")
 awful.util.spawn_with_shell("killall conky 2> /dev/null          ; conky -q")
-awful.util.spawn_with_shell("ps aux | grep batterymon | grep -v grep || python /home/hybris/dev/misc/batterymon-clone/batterymon")
+awful.util.spawn_with_shell("ps aux | grep batterymon | grep -v grep || python /home/hybris/dev/misc/batterymon-clone/batterymon -t 24x24_wide")
