@@ -81,6 +81,11 @@ globalkeys = awful.util.table.join({},
 									      awful.tag.selected().name = awful.tag.getidx(awful.tag.selected())
 									   end
    end}) end),
+   awful.key({modkey},
+      "p",
+      function ()
+	 awful.util.spawn('/home/zitune/bin/dmenu_aliases.py')
+   end),
    awful.key({modkey}, "F2",               function() awful.util.spawn('rofi -show run') end),
    awful.key({modkey}, "F3",               function() awful.util.spawn('rofi -show ssh') end),
    awful.key({modkey}, "j",                function() awful.util.spawn('rofi -show window') end),
