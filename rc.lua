@@ -33,73 +33,20 @@ beautiful.init(theme)
 ----------
 -- Keys --
 ----------
-modkey = "Mod4"
-globalkeys = awful.util.table.join({},
-           awful.key({modkey, "Control"}, "r",     awesome.restart),
-           awful.key({modkey, "Control"}, "q",     awesome.quit),
-           awful.key({modkey}, "Return",           function() awful.util.spawn("urxvtc") end),
-           awful.key({modkey}, "e",                function() awful.util.spawn_with_shell("emacsclient -c > /dev/null") end),
-           awful.key({modkey}, "F1",               function() awful.prompt.run({prompt = "Name: ",
-                                                                                textbox = mouse.screen.prompt.widget,
-                                                                                exe_callback = function(input)
-                                                                                   if input ~= "" then
-                                                                                      awful.tag.selected().name = awful.tag.getidx(awful.tag.selected())..":"..input
-                                                                                   else
-                                                                                      awful.tag.selected().name = awful.tag.getidx(awful.tag.selected())
-                                                                                   end
-                                                                                end}) end),
-           awful.key({modkey}, "F2",               function() awful.util.spawn('rofi -show run') end),
-           awful.key({modkey}, "F3",               function() awful.util.spawn('rofi -show ssh') end),
-           awful.key({modkey}, "j",                function() awful.util.spawn('rofi -show window') end),
-           awful.key({modkey}, "s",                function() awful.screen.focus(screen.count() - mouse.screen.index + 1) end),
-           awful.key({modkey}, "Left",             awful.tag.viewprev),
-           awful.key({modkey}, "Right",            awful.tag.viewnext),
-           awful.key({modkey}, "Escape",           awful.tag.history.restore),
-           awful.key({modkey, "Shift"}, "Left",    function() awful.client.focus.bydirection("left") end),
-           awful.key({modkey, "Shift"}, "Right",   function() awful.client.focus.bydirection("right") end),
-           awful.key({modkey, "Shift"}, "Up",      function() awful.client.focus.bydirection("up") end),
-           awful.key({modkey, "Shift"}, "Down",    function() awful.client.focus.bydirection("down") end),
-           awful.key({modkey}, "Tab",              function()
-                                                      awful.client.focus.byidx(1)
-                                                      if client.focus then client.focus:raise() end
-                                                   end),
-           awful.key({modkey, "Shift"}, "Tab",     function()
-                                                      awful.client.focus.byidx(-1)
-                                                      if client.focus then client.focus:raise() end
-                                                   end),
-           awful.key({modkey, "Control"}, "Left",  function() awful.client.swap.bydirection("left") end),
-           awful.key({modkey, "Control"}, "Right", function() awful.client.swap.bydirection("right") end),
-           awful.key({modkey, "Control"}, "Up",    function() awful.client.swap.bydirection("up") end),
-           awful.key({modkey, "Control"}, "Down",  function() awful.client.swap.bydirection("down") end),
-           awful.key({modkey}, "space",            function() awful.layout.inc({awful.layout.suit.fair, awful.layout.suit.max}, 1) end))
-
-for i = 1, 9
-do
-   globalkeys = awful.util.table.join(globalkeys,
-              awful.key({modkey}, "#" .. i + 9,            function() awful.screen.focused().tags[i]:view_only() end),
-              awful.key({modkey, "Shift"}, "#" .. i + 9,   function() if client.focus then client.focus:move_to_tag(client.focus.screen.tags[i]) end end),
-              awful.key({modkey, "Control"}, "#" .. i + 9, function() awful.tag.viewtoggle(awful.screen.focused().tags[i]) end))
-end
-root.keys(globalkeys)
-
-clientkeys = awful.util.table.join({},
-           awful.key({modkey}, "f",           function(c) c.fullscreen = not c.fullscreen end),
-           awful.key({modkey, "Shift"}, "c",  function(c) c:kill() end),
-           awful.key({modkey, "Shift"}, "s",  function(c) awful.client.movetotag(awful.tag.selected(screen.count() - mouse.screen.index + 1)) end))
-clientbuttons = awful.button({modkey}, 1,     function(c) awful.mouse.client.move(c) end)
+require("keys")
 
 -------------
 -- Display --
 -------------
 awful.screen.connect_for_each_screen(function(s)
-   awful.tag({1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42}, s, awful.layout.suit.fair)
-   gears.wallpaper.fit("/home/hybris/.wallpaper", s, "#000000")
+      awful.tag({1,2,3,4,5,6,7,8,9}, s, awful.layout.suit.fair)
+   gears.wallpaper.fit("/home/zitune/.wallpaper", s, "#000000")
    s.prompt = awful.widget.prompt()
    s.topbox = awful.wibar({position = "top", screen = s, height = 14})
    s.topbox:setup({layout = wibox.layout.align.horizontal,
                    {layout = wibox.layout.fixed.horizontal,
                     s.prompt,
-                    awful.widget.taglist(s, awful.widget.taglist.filter.noempty),
+                    awful.widget.taglist(s, awful.widget.taglist.filter.all),
                     wibox.widget.textbox(" | ")},
                    awful.widget.tasklist(s, awful.widget.tasklist.filter.currenttags, nil),
                    {layout = wibox.layout.fixed.horizontal,
@@ -146,4 +93,4 @@ awful.util.spawn_with_shell("killall nm-applet 2> /dev/null      ; nm-applet")
 awful.util.spawn_with_shell("killall pasystray 2> /dev/null      ; pasystray")
 awful.util.spawn_with_shell("killall blueman-applet 2> /dev/null ; blueman-applet > /dev/null 2>&1")
 awful.util.spawn_with_shell("killall conky 2> /dev/null          ; conky -q")
-awful.util.spawn_with_shell("ps aux | grep batterymon | grep -v grep || python /home/hybris/dev/misc/batterymon-clone/batterymon -t 24x24_wide")
+

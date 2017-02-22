@@ -84,7 +84,6 @@ globalkeys = awful.util.table.join({},
    awful.key({modkey}, "F2",               function() awful.util.spawn('rofi -show run') end),
    awful.key({modkey}, "F3",               function() awful.util.spawn('rofi -show ssh') end),
    awful.key({modkey}, "j",                function() awful.util.spawn('rofi -show window') end),
-   awful.key({modkey}, "s",                function() awful.screen.focus(screen.count() - mouse.screen.index + 1) end),
    awful.key({modkey}, "Escape",           awful.tag.history.restore),
    awful.key({modkey}, "Left",    function() awful.client.focus.bydirection("left") end),
    awful.key({modkey}, "Right",   function() awful.client.focus.bydirection("right") end),
@@ -163,13 +162,47 @@ do
    globalkeys = awful.util.table.join(globalkeys,
 				      
 				      awful.key({modkey, "Shift"}, "#" .. i + 9,            function() awful.screen.focused().tags[i]:view_only() end),
-				      awful.key({modkey, "Control"}, "#" .. i + 9,   function() if client.focus then client.focus:move_to_tag(client.focus.screen.tags[i]) end end),
-					 awful.key({modkey, "Alt"}, "#" .. i + 9, function() awful.tag.viewtoggle(awful.screen.focused().tags[i]) end))
+				      awful.key({modkey, "Control"}, "#" .. i + 9,   function() if client.focus then client.focus:move_to_tag(client.focus.screen.tags[i]) end end))
 end
 root.keys(globalkeys)
 
 clientkeys = awful.util.table.join({},
    awful.key({modkey}, "f",           function(c) c.fullscreen = not c.fullscreen end),
-   awful.key({modkey, "Shift"}, "c",  function(c) c:kill() end),
-   awful.key({modkey, "Shift"}, "s",  function(c) awful.client.movetotag(awful.tag.selected(screen.count() - mouse.screen.index + 1)) end))
+   awful.key({modkey}, "x",  function(c) c:kill() end))
+
+
+
+
+-- move thru screen
+
+
+clientkeys = awful.util.table.join(clientkeys,
+				   awful.key({"Mod1", "Control"}, "Down",  function(c)
+					 if (client.focus.screen.index > 1)
+					 then
+					    awful.client.movetotag(awful.tag.selected(client.focus.screen.index - 1))
+					 end
+				   end),
+				   awful.key({"Mod1", "Control"}, "Up",  function(c)
+					 if (client.focus.screen.index < screen.count())
+					 then
+					    awful.client.movetotag(awful.tag.selected(client.focus.screen.index + 1))
+					 end
+				   end),
+				   awful.key({"Mod1", "Shift"}, "Down",  function(c)
+					 if (client.focus.screen.index > 1)
+					 then
+					    awful.screen.focus(client.focus.screen.index - 1)
+					 end
+				   end),
+				   awful.key({"Mod1", "Shift"}, "Up",  function(c)
+					 if (client.focus.screen.index < screen.count())
+					 then
+					    awful.screen.focus(client.focus.screen.index + 1)
+					 end
+				   end)
+)
+   
+
+
 clientbuttons = awful.button({modkey}, 1,     function(c) awful.mouse.client.move(c) end)
