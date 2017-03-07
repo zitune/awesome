@@ -70,7 +70,7 @@ modkey = "Mod4"
 globalkeys = awful.util.table.join({},
    awful.key({modkey, "Control"}, "r",     awesome.restart),
    awful.key({modkey, "Control"}, "q",     awesome.quit),
-   awful.key({modkey, "Shift"}, "Return",           function() awful.util.spawn("urxvtc", awful.screen.focused()) end),
+   awful.key({modkey, "Shift"}, "Return",           function() awful.util.spawn("urxvtc") end),
    awful.key({modkey}, "e",                function() awful.util.spawn_with_shell("emacsclient -c > /dev/null") end),
    awful.key({modkey}, "F1",               function() awful.prompt.run({prompt = "Name: ",
 									textbox = mouse.screen.prompt.widget,
