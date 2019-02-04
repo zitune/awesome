@@ -182,29 +182,23 @@ clientkeys = awful.util.table.join({},
 
 
 clientkeys = awful.util.table.join(clientkeys,
-				   awful.key({"Mod1", "Control"}, "Down",  function(c)
+				   awful.key({"Mod1", "Control"}, "Up",  function(c)
 					 if (client.focus.screen.index > 1)
 					 then
 					    awful.client.movetotag(awful.tag.selected(client.focus.screen.index - 1))
 					 end
 				   end),
-				   awful.key({"Mod1", "Control"}, "Up",  function(c)
+				   awful.key({"Mod1", "Control"}, "Down",  function(c)
 					 if (client.focus.screen.index < screen.count())
 					 then
 					    awful.client.movetotag(awful.tag.selected(client.focus.screen.index + 1))
 					 end
 				   end),
-				   awful.key({"Mod1", "Shift"}, "Down",  function(c)
-					 if (client.focus.screen.index > 1)
-					 then
-					    awful.screen.focus(client.focus.screen.index - 1)
-					 end
-				   end),
 				   awful.key({"Mod1", "Shift"}, "Up",  function(c)
-					 if (client.focus.screen.index < screen.count())
-					 then
-					    awful.screen.focus(client.focus.screen.index + 1)
-					 end
+					 awful.screen.focus_relative(1)
+				   end),
+				   awful.key({"Mod1", "Shift"}, "Down",  function(c)
+					 awful.screen.focus_relative(1)
 				   end)
 )
    

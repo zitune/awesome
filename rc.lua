@@ -53,6 +53,8 @@ awful.screen.connect_for_each_screen(function(s)
                     wibox.widget.textbox(" | "),
                     wibox.widget.systray(),
                     wibox.widget.textbox(" | "),
+		    require("battery-widget") {},
+                    wibox.widget.textbox(" | "),
                     awful.widget.textclock("<span color='" .. theme.fg_focus .. "'>%d/%m/%Y %R</span>")}})
 end)
 
